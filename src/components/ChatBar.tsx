@@ -337,7 +337,7 @@ const ChatBar: React.FC = () => {
             target: { tabId: activeTabId },
             injectImmediately: true,
             func: getHtmlContent,
-            args: [config.selectors, config.selectorsAll],
+            args: [config.selectors, config.selectorsAll, config.customContext],
           });
         }
       })

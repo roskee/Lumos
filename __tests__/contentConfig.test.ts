@@ -8,31 +8,31 @@ describe("getContentConfig", () => {
       default: {
         chunkSize: 500,
         chunkOverlap: 0,
-        selectors: ["body"],
+        selectors: [{selector: "body"}],
         selectorsAll: [],
       },
       "domain.com": {
         chunkSize: 501,
         chunkOverlap: 1,
-        selectors: ["body"],
+        selectors: [{selector: "body"}],
         selectorsAll: [],
       },
       "domain.com/path1": {
         chunkSize: 502,
         chunkOverlap: 2,
-        selectors: ["body"],
+        selectors: [{selector: "body"}],
         selectorsAll: [],
       },
       "domain.com/path1/subpath1": {
         chunkSize: 503,
         chunkOverlap: 3,
-        selectors: ["body"],
+        selectors: [{selector: "body"}],
         selectorsAll: [],
       },
       "domain.com/path1/subpath2": {
         chunkSize: 504,
         chunkOverlap: 4,
-        selectors: ["body"],
+        selectors: [{selector: "body"}],
         selectorsAll: [],
       },
     };

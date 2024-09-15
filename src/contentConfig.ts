@@ -1,12 +1,17 @@
 const DEFAULT_CHUCK_SIZE = 500;
 const DEFAULT_CHUNK_OVERLAP = 0;
 
+export interface Selector {
+  selector: string;
+  template?: string;
+}
 export interface ContentConfig {
   [key: string]: {
     chunkSize: number;
     chunkOverlap: number;
-    selectors: string[];
-    selectorsAll: string[];
+    selectors: Selector[];
+    selectorsAll: Selector[];
+    customContext?: string;
   };
 }
 
@@ -14,7 +19,11 @@ export const defaultContentConfig: ContentConfig = {
   default: {
     chunkSize: DEFAULT_CHUCK_SIZE,
     chunkOverlap: DEFAULT_CHUNK_OVERLAP,
-    selectors: ["body"],
+    selectors: [
+      {
+        selector: "body",
+      },
+    ],
     selectorsAll: [],
   },
 };
@@ -29,11 +38,12 @@ export const isContentConfig = (input: string): boolean => {
         !Array.isArray(parsedConfig[key].selectors) ||
         !Array.isArray(parsedConfig[key].selectorsAll) ||
         !parsedConfig[key].selectors.every(
-          (selector) => typeof selector === "string",
+          (selector) => (typeof selector === "object" && typeof selector.selector === "string" && (typeof selector.template === "string" || selector.template === undefined)),
         ) ||
         !parsedConfig[key].selectorsAll.every(
-          (selector) => typeof selector === "string",
-        )
+          (selector) => (typeof selector === "object" && typeof selector.selector === "string" && (typeof selector.template === "string" || selector.template === undefined)),
+        ) ||
+        (parsedConfig[key].customContext && typeof parsedConfig[key].customContext !== "string")
       ) {
         return false;
       }
@@ -62,8 +72,9 @@ export const getContentConfig = (
 ): null | {
   chunkSize: number;
   chunkOverlap: number;
-  selectors: string[];
-  selectorsAll: string[];
+  selectors: Selector[];
+  selectorsAll: Selector[];
+  customContext?: string;
 } => {
   const domainParts = url.hostname.split(".");
   const topLevelDomain = `${domainParts[domainParts.length - 2]}.${domainParts[domainParts.length - 1]}`;
