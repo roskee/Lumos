@@ -16,6 +16,9 @@ import {
 import { Runnable, RunnableSequence } from "@langchain/core/runnables";
 import { ConsoleCallbackHandler } from "@langchain/core/tracers/console";
 import { IterableReadableStream } from "@langchain/core/utils/stream";
+import { ChatOpenAI } from "@langchain/openai";
+import { OpenAI } from "@langchain/openai";
+import { OpenAIEmbeddings } from "@langchain/openai";
 import { RecursiveCharacterTextSplitter } from "langchain/text_splitter";
 import { formatDocumentsAsString } from "langchain/util/document";
 
@@ -35,6 +38,7 @@ import {
 } from "../tools/calculator";
 import { EnhancedMemoryVectorStore } from "../vectorstores/enhanced_memory";
 
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 interface VectorStoreMetadata {
   vectorStore: EnhancedMemoryVectorStore;
   createdAt: number;
@@ -89,10 +93,11 @@ const classifyPrompt = async (
   }
 
   // otherwise, attempt to classify prompt
-  const ollama = new Ollama({
-    baseUrl: options.ollamaHost,
-    model: options.ollamaModel,
-    keepAlive: DEFAULT_KEEP_ALIVE,
+  const ollama = new OpenAI({
+    apiKey: OPENAI_API_KEY,
+    // baseUrl: options.ollamaHost,
+    // model: options.ollamaModel,
+    // keepAlive: DEFAULT_KEEP_ALIVE,
     temperature: 0,
     stop: [".", ","],
   }).bind({
@@ -176,10 +181,11 @@ const downloadImages = async (imageURLs: string[]): Promise<string[]> => {
 };
 
 const getChatModel = (options: LumosOptions): Runnable => {
-  return new ChatOllama({
-    baseUrl: options.ollamaHost,
-    model: options.ollamaModel,
-    keepAlive: DEFAULT_KEEP_ALIVE,
+  return new ChatOpenAI({
+    apiKey: OPENAI_API_KEY,
+    // baseUrl: options.ollamaHost,
+    // model: options.ollamaModel,
+    // keepAlive: DEFAULT_KEEP_ALIVE,
     callbacks: [new ConsoleCallbackHandler()],
   }).bind({
     signal: controller.signal,
@@ -407,10 +413,13 @@ chrome.runtime.onMessage.addListener(async (request) => {
 
       // load documents into vector store
       vectorStore = new EnhancedMemoryVectorStore(
-        new OllamaEmbeddings({
-          baseUrl: options.ollamaHost,
-          model: options.ollamaEmbeddingModel,
-          keepAlive: DEFAULT_KEEP_ALIVE,
+        new OpenAIEmbeddings({
+          // baseUrl: options.ollamaHost,
+          // model: options.ollamaEmbeddingModel,
+          // keepAlive: DEFAULT_KEEP_ALIVE,
+          apiKey: OPENAI_API_KEY,
+          batchSize: 512, // Default value if omitted is 512. Max is 2048
+          model: "text-embedding-3-large",
         }),
       );
       for (let index = 0; index < documents.length; index++) {
